@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Platform, PermissionsAndroid } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Platform, PermissionsAndroid, Button } from "react-native";
 import MapView, { Marker, AnimatedRegion, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import haversine from "haversine";
 
@@ -11,10 +11,30 @@ const LONGITUDE = -122.4324;
 export default class Map extends React.Component {
   constructor(props) {
     super(props);
+    this.state = this.getInitialState();
+  }
 
-    this.state = {
+  getInitialState = () => {
+    const initialState = {
+      circuitStarted: false,
       latitude: LATITUDE,
       longitude: LONGITUDE,
+      routeCoordinates: [],
+      distanceTravelled: 1,
+      prevLatLng: {},
+      coordinate: new AnimatedRegion({
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+        latitudeDelta: 0,
+        longitudeDelta: 0
+      })
+    };
+    return initialState;
+  }
+
+  getResetState = (circuitStarted) => {
+    const resetState = {
+      circuitStarted: circuitStarted,
       routeCoordinates: [],
       distanceTravelled: 0,
       prevLatLng: {},
@@ -25,12 +45,11 @@ export default class Map extends React.Component {
         longitudeDelta: 0
       })
     };
+    return resetState;
   }
 
   componentDidMount() {
     const { coordinate } = this.state;
-
-    //this.requestCameraPermission();
 
     this.watchID = navigator.geolocation.watchPosition(
       position => {
@@ -77,6 +96,14 @@ export default class Map extends React.Component {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
+  finishCircuit = () => {
+    this.setState(this.getResetState(false));
+  }
+
+  startCircuit = () => {
+    this.setState(this.getResetState(true));
+  }
+
   getMapRegion = () => ({
     latitude: this.state.latitude,
     longitude: this.state.longitude,
@@ -89,38 +116,32 @@ export default class Map extends React.Component {
     return haversine(prevLatLng, newLatLng) || 0;
   };
 
-  requestCameraPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        {
-          title: "Location Access Permission",
-          buttonNeutral: "Ask Me Later",
-          buttonNegative: "Cancel",
-          buttonPositive: "OK"
-        }
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log("You can use the camera");
-      } else {
-        console.log("Camera permission denied");
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  };
-
   render() {
+    let content = null;
+
+    if (this.state.circuitStarted == true) {
+      content = (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={[styles.bubble, styles.button]}>
+            <Text style={styles.bottomBarContent}>{parseFloat(this.state.distanceTravelled).toFixed(2)} km</Text>
+            <Button onPress={this.finishCircuit} title="Terminar Circuito" />
+          </TouchableOpacity>
+        </View>
+
+      );
+    } else {
+      content = (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={[styles.bubble, styles.button]}>
+            <Button onPress={this.startCircuit} title="Iniciar Circuito" />
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.container}>
-        <MapView
-          style={styles.map}
-          provider={PROVIDER_GOOGLE}
-          showUserLocation
-          followUserLocation
-          loadingEnabled
-          region={this.getMapRegion()}
-        >
+        <MapView style={styles.map} provider={PROVIDER_GOOGLE} showUserLocation followUserLocation loadingEnabled region={this.getMapRegion()}>
           <Polyline coordinates={this.state.routeCoordinates} strokeWidth={5} />
           <Marker.Animated
             ref={marker => {
@@ -129,13 +150,7 @@ export default class Map extends React.Component {
             coordinate={this.state.coordinate}
           />
         </MapView>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.bubble, styles.button]}>
-            <Text style={styles.bottomBarContent}>
-              {parseFloat(this.state.distanceTravelled).toFixed(2)} km
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {content}
       </View>
     );
   }
