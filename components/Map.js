@@ -48,7 +48,7 @@ export default class Map extends React.Component {
     return resetState;
   }
 
-  componentDidMount() {
+  getCurrentPosition() {
     const { coordinate } = this.state;
 
     this.watchID = navigator.geolocation.watchPosition(
@@ -92,16 +92,22 @@ export default class Map extends React.Component {
     );
   }
 
+  componentDidMount() {
+    this.getCurrentPosition();
+  }
+
   componentWillUnmount() {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
   finishCircuit = () => {
     this.setState(this.getResetState(false));
+    this.getCurrentPosition();
   }
 
   startCircuit = () => {
     this.setState(this.getResetState(true));
+    this.getCurrentPosition();
   }
 
   getMapRegion = () => ({
@@ -123,7 +129,7 @@ export default class Map extends React.Component {
       content = (
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={[styles.bubble, styles.button]}>
-            <Text style={styles.bottomBarContent}>{parseFloat(this.state.distanceTravelled).toFixed(2)} km</Text>
+            <Text style={styles.bottomBarContent}>Distância: {parseFloat(this.state.distanceTravelled).toFixed(2)} km</Text>
             <Button onPress={this.finishCircuit} title="Terminar Circuito" />
           </TouchableOpacity>
         </View>
