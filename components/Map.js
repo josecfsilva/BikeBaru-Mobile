@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Platform, PermissionsAndroid, Button } from "react-native";
+import { StyleSheet, View, Image, Text, Platform, PermissionsAndroid, TouchableOpacity, Button } from "react-native";
 import MapView, { Marker, AnimatedRegion, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import haversine from "haversine";
 
@@ -11,30 +11,11 @@ const LONGITUDE = -122.4324;
 export default class Map extends React.Component {
   constructor(props) {
     super(props);
-    this.state = this.getInitialState();
-  }
 
-  getInitialState = () => {
-    const initialState = {
+    this.state = {
       circuitStarted: false,
       latitude: LATITUDE,
       longitude: LONGITUDE,
-      routeCoordinates: [],
-      distanceTravelled: 1,
-      prevLatLng: {},
-      coordinate: new AnimatedRegion({
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
-        latitudeDelta: 0,
-        longitudeDelta: 0
-      })
-    };
-    return initialState;
-  }
-
-  getResetState = (circuitStarted) => {
-    const resetState = {
-      circuitStarted: circuitStarted,
       routeCoordinates: [],
       distanceTravelled: 0,
       prevLatLng: {},
@@ -45,12 +26,21 @@ export default class Map extends React.Component {
         longitudeDelta: 0
       })
     };
-    return resetState;
   }
 
-  getCurrentPosition() {
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          error: null
+        });
+      },
+      error => this.setState({ error: error.message }),
+      { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 }
+    );
     const { coordinate } = this.state;
-
     this.watchID = navigator.geolocation.watchPosition(
       position => {
         const { routeCoordinates, distanceTravelled } = this.state;
@@ -78,7 +68,7 @@ export default class Map extends React.Component {
           longitude,
           routeCoordinates: routeCoordinates.concat([newCoordinate]),
           distanceTravelled:
-            distanceTravelled + this.calcDistance(newCoordinate),
+            distanceTravelled + this.calculateDistance(newCoordinate),
           prevLatLng: newCoordinate
         });
       },
@@ -92,22 +82,8 @@ export default class Map extends React.Component {
     );
   }
 
-  componentDidMount() {
-    this.getCurrentPosition();
-  }
-
   componentWillUnmount() {
     navigator.geolocation.clearWatch(this.watchID);
-  }
-
-  finishCircuit = () => {
-    this.setState(this.getResetState(false));
-    this.getCurrentPosition();
-  }
-
-  startCircuit = () => {
-    this.setState(this.getResetState(true));
-    this.getCurrentPosition();
   }
 
   getMapRegion = () => ({
@@ -117,10 +93,24 @@ export default class Map extends React.Component {
     longitudeDelta: LONGITUDE_DELTA
   });
 
-  calcDistance = newLatLng => {
+  calculateDistance = newLatLng => {
     const { prevLatLng } = this.state;
     return haversine(prevLatLng, newLatLng) || 0;
   };
+
+  finishCircuit = () => {
+    this.setState({
+      circuitStarted: false,
+      routeCoordinates: [],
+      distanceTravelled: 0,
+    });
+  }
+
+  startCircuit = () => {
+    this.setState({
+      circuitStarted: true
+    });
+  }
 
   render() {
     let content = null;
@@ -133,7 +123,6 @@ export default class Map extends React.Component {
             <Button onPress={this.finishCircuit} title="Terminar Circuito" />
           </TouchableOpacity>
         </View>
-
       );
     } else {
       content = (
@@ -153,8 +142,12 @@ export default class Map extends React.Component {
             ref={marker => {
               this.marker = marker;
             }}
-            coordinate={this.state.coordinate}
-          />
+            coordinate={this.state.coordinate}>
+            <Image
+              source={require("../assets/images/bike.png")}
+              style={{ height: 35, width: 35 }}
+            />
+          </Marker.Animated>
         </MapView>
         {content}
       </View>

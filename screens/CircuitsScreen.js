@@ -1,10 +1,11 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
+import Circuits from '../components/Circuits';
 
 export default function CircuitsScreen() {
   return (
     <ScrollView style={styles.container}>
-        <Text>Aqui é a lista de Circuitos!</Text>
+      <Circuits />
     </ScrollView>
   );
 }
