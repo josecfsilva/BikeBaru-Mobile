@@ -17,7 +17,7 @@ export default class Map extends React.Component {
       latitude: LATITUDE,
       longitude: LONGITUDE,
       routeCoordinates: [],
-      distanceTravelled: 1,
+      distanceTravelled: 0,
       prevLatLng: {},
       coordinate: new AnimatedRegion({
         latitude: LATITUDE,
