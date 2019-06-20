@@ -17,7 +17,7 @@ export default class Map extends React.Component {
       latitude: LATITUDE,
       longitude: LONGITUDE,
       routeCoordinates: [],
-      distanceTravelled: 0,
+      distanceTravelled: 1,
       prevLatLng: {},
       coordinate: new AnimatedRegion({
         latitude: LATITUDE,
@@ -42,7 +42,7 @@ export default class Map extends React.Component {
     );
 
     const { coordinate } = this.state;
-    
+
     this.watchID = navigator.geolocation.watchPosition(
       position => {
         const { routeCoordinates, distanceTravelled } = this.state;
@@ -88,6 +88,19 @@ export default class Map extends React.Component {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
+  saveCircuit() {
+    const name = "testename";
+    const initial_location = "testeinit";
+    const final_location = "testeinit";
+    const time = "testetime";
+    const velocity = 0;
+    const calories = 0;
+
+    fetch(`http://172.20.10.14:4000/circuits/add?name=${name}&initial_location=${initial_location}&final_location=${final_location}&time=${time}&velocity=${velocity}&distance=${parseFloat(this.state.distanceTravelled).toFixed(2)}&calories=${calories}&partner_id=1`)
+      .catch(err => console.error(err))
+    
+  }
+
   getMapRegion = () => ({
     latitude: this.state.latitude,
     longitude: this.state.longitude,
@@ -106,6 +119,7 @@ export default class Map extends React.Component {
       routeCoordinates: [],
       distanceTravelled: 0,
     });
+    this.saveCircuit();
   }
 
   startCircuit = () => {
