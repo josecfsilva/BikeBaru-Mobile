@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Image, Text, Platform, PermissionsAndroid, TouchableOpacity, Button } from "react-native";
+import { StyleSheet, View, Image, Text, Platform, TouchableOpacity, Button } from "react-native";
 import MapView, { Marker, AnimatedRegion, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import haversine from "haversine";
 
@@ -40,7 +40,9 @@ export default class Map extends React.Component {
       error => this.setState({ error: error.message }),
       { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 }
     );
+
     const { coordinate } = this.state;
+    
     this.watchID = navigator.geolocation.watchPosition(
       position => {
         const { routeCoordinates, distanceTravelled } = this.state;
