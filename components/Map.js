@@ -77,17 +77,15 @@ export default class Map extends React.Component {
   }
 
   saveCircuit() {
-    const name = "testename";
     const initial_location = "testeinit";
     const final_location = "testeinit";
     const time = "testetime";
     const velocity = 10;
     const calories = 19;
 
-    fetch(`http://192.168.1.74:4000/circuits/add?name=${name}&initial_location=${initial_location}&final_location=${final_location}&time=${time}&velocity=${velocity}&distance=${parseFloat(this.state.distanceTravelled).toFixed(2)}&calories=${calories}&partner_id=1`)
+    fetch(`http://192.168.1.74:4000/circuits/add?initial_location=${initial_location}&final_location=${final_location}&time=${time}&velocity=${velocity}&distance=${parseFloat(this.state.distanceTravelled).toFixed(2)}&calories=${calories}&partner_id=1`)
       .then(Alert.alert('Circuito Terminado'))
       .catch(err => console.error(err))
-
   }
 
   getMapRegion = () => ({
