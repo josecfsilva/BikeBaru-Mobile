@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Image, Text, Platform, TouchableOpacity, Button } from "react-native";
+import { StyleSheet, View, Alert, Image, Text, Platform, TouchableOpacity, Button } from "react-native";
 import MapView, { Marker, AnimatedRegion, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import haversine from "haversine";
 
@@ -93,12 +93,13 @@ export default class Map extends React.Component {
     const initial_location = "testeinit";
     const final_location = "testeinit";
     const time = "testetime";
-    const velocity = 0;
-    const calories = 0;
+    const velocity = 10;
+    const calories = 19;
 
-    fetch(`http://172.20.10.14:4000/circuits/add?name=${name}&initial_location=${initial_location}&final_location=${final_location}&time=${time}&velocity=${velocity}&distance=${parseFloat(this.state.distanceTravelled).toFixed(2)}&calories=${calories}&partner_id=1`)
+    fetch(`http://192.168.1.74:4000/circuits/add?name=${name}&initial_location=${initial_location}&final_location=${final_location}&time=${time}&velocity=${velocity}&distance=${parseFloat(this.state.distanceTravelled).toFixed(2)}&calories=${calories}&partner_id=1`)
+      .then(Alert.alert('Circuito Terminado'))
       .catch(err => console.error(err))
-    
+
   }
 
   getMapRegion = () => ({

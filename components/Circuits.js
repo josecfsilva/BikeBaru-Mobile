@@ -14,7 +14,7 @@ export default class Circuits extends React.Component {
     }
 
     showCircuits = _ => {
-        fetch('http://172.20.10.14:4000/circuits/')
+        fetch('http://192.168.1.74:4000/circuits/')
             .then(response => response.json())
             .then(response => this.setState({
                 circuits: response.data
