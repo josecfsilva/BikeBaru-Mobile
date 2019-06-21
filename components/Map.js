@@ -29,18 +29,6 @@ export default class Map extends React.Component {
   }
 
   componentDidMount() {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          error: null
-        });
-      },
-      error => this.setState({ error: error.message }),
-      { enableHighAccuracy: false, timeout: 200000, maximumAge: 1000 }
-    );
-
     const { coordinate } = this.state;
 
     this.watchID = navigator.geolocation.watchPosition(
