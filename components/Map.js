@@ -105,7 +105,7 @@ export default class Map extends React.Component {
         partner_id: 1,
       })
     })
-      .then(Alert.alert('Estatísticas do Circuito', 'Distância: ' + distance + 'km' + '\nTempo: ' + time + "\nVelocidade Média: " + velocity + 'km/h'))
+      .then(Alert.alert('Estatísticas do Circuito', 'Distância: ' + distance + ' km' + '\nTempo: ' + time + "\nVelocidade Média: " + velocity + ' km/h'))
       .catch(err => console.error(err));
   }
 
