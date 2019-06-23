@@ -1,7 +1,9 @@
-import React from 'react'
-import { StyleSheet, FlatList, Text, View } from 'react-native'
+import React from 'react';
+import { StyleSheet, FlatList, Text, View, RefreshControl, Button } from 'react-native';
+import { Icon } from 'react-native-elements';
 
 export default class Circuits extends React.Component {
+
     constructor() {
         super();
         this.state = {
@@ -10,14 +12,14 @@ export default class Circuits extends React.Component {
     }
 
     componentDidMount() {
-        this.showCircuits();
+        this.loadCircuits();
     }
 
-    showCircuits = _ => {
-        fetch('http://192.168.1.74:4000/circuits/')
+    loadCircuits = () => {
+        fetch('https://bikebaru-server.herokuapp.com/circuits/')
             .then(response => response.json())
             .then(response => this.setState({
-                circuits: response.data
+                circuits: response.data,
             }))
             .catch(err => console.log(err))
     }
@@ -25,6 +27,7 @@ export default class Circuits extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+                <Icon name='refresh' type='foundation' onPress={this.loadCircuits} />
                 <FlatList data={this.state.circuits} keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) =>
                         <View style={{ backgroundColor: '#2f95dc', padding: 10, margin: 10 }}>
