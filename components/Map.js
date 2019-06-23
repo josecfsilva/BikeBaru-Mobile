@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, View, Alert, Image, Text, Platform, TouchableOpacity, Button } from "react-native";
 import MapView, { Marker, AnimatedRegion, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import haversine from "haversine";
+import { Stopwatch } from 'react-native-stopwatch-timer';
 
 const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
@@ -14,18 +15,21 @@ export default class Map extends React.Component {
 
     this.state = {
       circuitStarted: false,
+      distanceTravelled: 0.0,
+
       latitude: LATITUDE,
       longitude: LONGITUDE,
       routeCoordinates: [],
-      elapsedTime: 0,
-      distanceTravelled: 0,
       prevLatLng: {},
       coordinate: new AnimatedRegion({
         latitude: LATITUDE,
         longitude: LONGITUDE,
         latitudeDelta: 0,
         longitudeDelta: 0
-      })
+      }),
+
+      isStopwatchStart: false,
+      resetStopwatch: false
     };
   }
 
@@ -78,18 +82,18 @@ export default class Map extends React.Component {
   }
 
   saveCircuit() {
-    const initial_location = "testeinit";
-    const final_location = "testeinit";
-    const time = "testetime";
+    const initial_location = "teste";
+    const final_location = "teste";
+    const time = this.currentTime;
     const distance = parseFloat(this.state.distanceTravelled).toFixed(2);
     const velocity = 10;
-    const calories = 19;
+    const calories = 0;
 
     fetch('https://bikebaru-server.herokuapp.com/circuits/add', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json'  
       },
       body: JSON.stringify({
         initial_location,
@@ -101,10 +105,11 @@ export default class Map extends React.Component {
         partner_id: 1,
       })
     })
-      .then(Alert.alert('Circuito Terminado'))
+      .then(Alert.alert('Estatísticas do Circuito', 'Distância: ' + distance + 'km' + '\nTempo: ' + time + "\nVelocidade Média: " + velocity + 'km/h'))
       .catch(err => console.error(err));
   }
 
+  // Map
   getMapRegion = () => ({
     latitude: this.state.latitude,
     longitude: this.state.longitude,
@@ -112,24 +117,48 @@ export default class Map extends React.Component {
     longitudeDelta: LONGITUDE_DELTA
   });
 
+  // Distance
   calculateDistance = newLatLng => {
     const { prevLatLng } = this.state;
     return haversine(prevLatLng, newLatLng) || 0;
   };
 
+  // Time
+  startStopStopWatch() {
+    this.setState({ isStopwatchStart: !this.state.isStopwatchStart, resetStopwatch: false });
+  }
+
+  resetStopwatch() {
+    this.setState({ isStopwatchStart: false, resetStopwatch: true });
+  }
+
+  getFormattedTime = (time) => {
+    this.currentTime = time;
+  }
+
+  // Start Circuit
+  startCircuit = () => {
+    this.setState({
+      circuitStarted: true,
+      distanceTravelled: 0.00,
+      routeCoordinates: [],
+      prevLatLng: {}
+    });
+    this.startStopStopWatch();
+  }
+
+  // Finish Circuit
   finishCircuit = () => {
     this.setState({
       circuitStarted: false,
       routeCoordinates: [],
-      distanceTravelled: 0,
+      distanceTravelled: 0.00,
+      prevLatLng: {}
     });
-    this.saveCircuit();
-  }
 
-  startCircuit = () => {
-    this.setState({
-      circuitStarted: true
-    });
+    this.saveCircuit();
+    this.startStopStopWatch();
+    this.resetStopwatch();
   }
 
   render() {
@@ -138,10 +167,17 @@ export default class Map extends React.Component {
     if (this.state.circuitStarted == true) {
       content = (
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.bubble, styles.button]}>
-            <Text style={styles.bottomBarContent}>Distância: {parseFloat(this.state.distanceTravelled).toFixed(2)} km</Text>
+          <View style={[styles.bubble, styles.button]}>
+
+            <Text style={{ fontWeight: 'bold' }}>Distância</Text>
+            <Text style={{ marginBottom: 10 }}>{parseFloat(this.state.distanceTravelled).toFixed(2)} km</Text>
+
+            <Text style={{ fontWeight: 'bold' }}>Tempo</Text>
+            <Stopwatch laps start={this.state.isStopwatchStart} reset={this.state.resetStopwatch} options={styles} getTime={this.getFormattedTime} />
+          </View>
+          <View style={[styles.bubble, styles.button]}>
             <Button onPress={this.finishCircuit} title="Terminar Circuito" />
-          </TouchableOpacity>
+          </View>
         </View>
       );
     } else {
@@ -157,16 +193,13 @@ export default class Map extends React.Component {
     return (
       <View style={styles.container}>
         <MapView style={styles.map} provider={PROVIDER_GOOGLE} showUserLocation followUserLocation loadingEnabled region={this.getMapRegion()}>
-          <Polyline coordinates={this.state.routeCoordinates} strokeWidth={5} />
+          <Polyline coordinates={this.state.routeCoordinates} strokeWidth={3} />
           <Marker.Animated
             ref={marker => {
               this.marker = marker;
             }}
             coordinate={this.state.coordinate}>
-            <Image
-              source={require("../assets/images/bike.png")}
-              style={{ height: 35, width: 35 }}
-            />
+            <Image source={require("../assets/images/bike.png")} style={{ height: 35, width: 35 }} />
           </Marker.Animated>
         </MapView>
         {content}

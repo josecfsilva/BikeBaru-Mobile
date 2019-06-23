@@ -32,7 +32,7 @@ export default class Circuits extends React.Component {
                     renderItem={({ item }) =>
                         <View style={{ backgroundColor: '#2f95dc', padding: 10, margin: 10 }}>
                             <Text style={{ color: '#fff', fontWeight: 'bold' }}>{item.initial_location} > {item.final_location}</Text>
-                            <Text>Tempo: {item.time} | Distância: {item.distance} km | Velocidade: {item.velocity} km/h</Text>
+                            <Text>Distância: {item.distance} km | Tempo: {item.time} | Velocidade: {item.velocity} km/h</Text>
                         </View>
                     }
                 />
