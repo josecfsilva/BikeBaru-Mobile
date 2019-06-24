@@ -9,12 +9,16 @@ const LONGITUDE_DELTA = 0.009;
 const LATITUDE = 37.78825;
 const LONGITUDE = -122.4324;
 
+const API_KEY = 'AIzaSyBgJA1q6bhI05LpACbOnNA4RR8TWnwqPR0';
+
 export default class Map extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       circuitStarted: false,
+      initial_location: '',
+      final_location: '',
       distanceTravelled: 0.0,
       currentSpeed: 0.0,
       speeds: [],
@@ -84,12 +88,16 @@ export default class Map extends React.Component {
   }
 
   saveCircuit() {
-    const initial_location = "teste";
-    const final_location = "teste";
+    const initial_location = this.state.initial_location;
+    const final_location = this.state.final_location;
     const time = this.currentTime;
     const distance = parseFloat(this.state.distanceTravelled).toFixed(2);
     const velocity = this.calculateAverageVelocity();
     const calories = 0;
+
+    console.log("save init " + initial_location)
+
+    console.log("save final " + final_location)
 
     fetch('https://bikebaru-server.herokuapp.com/circuits/add', {
       method: 'POST',
@@ -119,6 +127,33 @@ export default class Map extends React.Component {
     longitudeDelta: LONGITUDE_DELTA
   });
 
+  // Location
+  getLocation = (locationType) => {
+    const { latitude, longitude } = this.state;
+    let location = '';
+
+    fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + latitude + ',' + longitude + '&key=' + API_KEY)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        location = responseJson.results[0].address_components[2].long_name;
+        if (locationType === 'initial_location') {
+          console.log("init " + location);
+
+          this.setState({
+            initial_location: location
+          })
+        }
+        if (locationType === 'final_location') {
+          console.log("final " + location);
+
+          this.setState({
+            final_location: location
+          })
+        }
+      })
+      .catch(err => console.log(err));
+  }
+
   // Distance
   calculateDistance = newLatLng => {
     const { prevLatLng } = this.state;
@@ -140,6 +175,8 @@ export default class Map extends React.Component {
 
   // Start Circuit
   startCircuit = () => {
+    this.getLocation('initial_location');
+
     this.setState({
       circuitStarted: true,
       routeCoordinates: [],
@@ -152,6 +189,8 @@ export default class Map extends React.Component {
 
   // Finish Circuit
   finishCircuit = () => {
+    this.getLocation('final_location');
+
     this.setState({
       circuitStarted: false,
       routeCoordinates: [],
@@ -161,9 +200,12 @@ export default class Map extends React.Component {
     });
 
     this.calculateAverageVelocity();
-    this.saveCircuit();
-    this.startStopStopWatch();
-    this.resetStopwatch();
+    setTimeout(() => {
+      this.saveCircuit();
+      this.startStopStopWatch();
+      this.resetStopwatch();
+    }, 1000);
+
   }
 
   // Average Velocity
