@@ -208,10 +208,12 @@ export default class Map extends React.Component {
     let speeds = this.state.speeds;
     let averageSpeed = 0.0;
 
-    for (var i = 0; i < speeds.length; i++) {
-      averageSpeed += speeds[i];
+    if (speeds.length != 0) {
+      for (var i = 0; i < speeds.length; i++) {
+        averageSpeed += speeds[i];
+      }
+      averageSpeed = parseFloat(averageSpeed / speeds.length).toFixed(2);
     }
-    averageSpeed = parseFloat(averageSpeed / speeds.length).toFixed(2);
 
     return averageSpeed;
   }
