@@ -27,13 +27,23 @@ export default class Circuits extends React.Component {
             .catch(err => console.log(err))
     }
 
+    /* Get Circuits */
+    static getCircuits() {
+        return fetch(SERVER_URL + '/circuits/')
+            .then((response) => {
+                return response.json();
+            })
+
+            .catch(err => console.log(err))
+    }
+
     render() {
         return (
             <View style={styles.container}>
                 <Icon name='refresh' type='foundation' onPress={this.loadCircuits} />
                 <FlatList data={this.state.circuits} keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) =>
-                        <View style={{ backgroundColor: '#2f95dc', padding: 10, margin: 10, alignItems:"center" }}>
+                        <View style={{ backgroundColor: '#2f95dc', padding: 10, margin: 10, alignItems: "center" }}>
                             <Text style={{ color: '#fff', fontWeight: 'bold' }}>{item.initial_location} > {item.final_location}</Text>
                             <Text>Distância: {item.distance} km | Tempo: {item.time}</Text>
                             <Text>Velocidade Média: {item.velocity} km/h</Text>

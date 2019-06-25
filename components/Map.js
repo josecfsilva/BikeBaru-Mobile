@@ -9,7 +9,7 @@ const LONGITUDE_DELTA = 0.009;
 const LATITUDE = 37.78825;
 const LONGITUDE = -122.4324;
 
-const URL_SERVER = 'https://bikebaru-server.herokuapp.com';
+const SERVER_URL = 'https://bikebaru-server.herokuapp.com';
 const API_KEY = 'AIzaSyBgJA1q6bhI05LpACbOnNA4RR8TWnwqPR0';
 
 export default class Map extends React.Component {
@@ -99,7 +99,7 @@ export default class Map extends React.Component {
     const velocity = this.calculateAverageSpeed();
     const calories = 0;
 
-    fetch(URL_SERVER + '/circuits/add', {
+    fetch(SERVER_URL + '/circuits/add', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -216,6 +216,16 @@ export default class Map extends React.Component {
     }
 
     return averageSpeed;
+  }
+
+  /* Get Partners */
+  static getPartners() {
+    return fetch(SERVER_URL + '/partners/')
+      .then((response) => {
+        return response.json();
+      })
+
+      .catch(err => console.log(err))
   }
 
   render() {
