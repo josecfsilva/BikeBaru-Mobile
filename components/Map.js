@@ -9,6 +9,7 @@ const LONGITUDE_DELTA = 0.009;
 const LATITUDE = 37.78825;
 const LONGITUDE = -122.4324;
 
+const URL_SERVER = 'https://bikebaru-server.herokuapp.com';
 const API_KEY = 'AIzaSyBgJA1q6bhI05LpACbOnNA4RR8TWnwqPR0';
 
 export default class Map extends React.Component {
@@ -17,15 +18,18 @@ export default class Map extends React.Component {
 
     this.state = {
       circuitStarted: false,
+
       initial_location: '',
       final_location: '',
       distanceTravelled: 0.0,
       currentSpeed: 0.0,
       speeds: [],
+
       latitude: LATITUDE,
       longitude: LONGITUDE,
       routeCoordinates: [],
       prevLatLng: {},
+
       coordinate: new AnimatedRegion({
         latitude: LATITUDE,
         longitude: LONGITUDE,
@@ -50,7 +54,6 @@ export default class Map extends React.Component {
           latitude,
           longitude
         };
-        console.log({ newCoordinate });
 
         if (Platform.OS === "android") {
           if (this.marker) {
@@ -87,19 +90,16 @@ export default class Map extends React.Component {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
+  /* Add Circuit */
   saveCircuit() {
     const initial_location = this.state.initial_location;
     const final_location = this.state.final_location;
     const time = this.currentTime;
     const distance = parseFloat(this.state.distanceTravelled).toFixed(2);
-    const velocity = this.calculateAverageVelocity();
+    const velocity = this.calculateAverageSpeed();
     const calories = 0;
 
-    console.log("save init " + initial_location)
-
-    console.log("save final " + final_location)
-
-    fetch('https://bikebaru-server.herokuapp.com/circuits/add', {
+    fetch(URL_SERVER + '/circuits/add', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -119,7 +119,7 @@ export default class Map extends React.Component {
       .catch(err => console.error(err));
   }
 
-  // Map
+  /* Map */
   getMapRegion = () => ({
     latitude: this.state.latitude,
     longitude: this.state.longitude,
@@ -127,7 +127,7 @@ export default class Map extends React.Component {
     longitudeDelta: LONGITUDE_DELTA
   });
 
-  // Location
+  /* Location */
   getLocation = (locationType) => {
     const { latitude, longitude } = this.state;
     let location = '';
@@ -137,15 +137,11 @@ export default class Map extends React.Component {
       .then((responseJson) => {
         location = responseJson.results[0].address_components[2].long_name;
         if (locationType === 'initial_location') {
-          console.log("init " + location);
-
           this.setState({
             initial_location: location
           })
         }
         if (locationType === 'final_location') {
-          console.log("final " + location);
-
           this.setState({
             final_location: location
           })
@@ -154,13 +150,13 @@ export default class Map extends React.Component {
       .catch(err => console.log(err));
   }
 
-  // Distance
+  /* Distance */
   calculateDistance = newLatLng => {
     const { prevLatLng } = this.state;
     return haversine(prevLatLng, newLatLng) || 0;
   };
 
-  // Time
+  /* Time */
   startStopStopWatch() {
     this.setState({ isStopwatchStart: !this.state.isStopwatchStart, resetStopwatch: false });
   }
@@ -173,17 +169,21 @@ export default class Map extends React.Component {
     this.currentTime = time;
   }
 
-  // Start Circuit
+  /* Start Circuit */
   startCircuit = () => {
     this.getLocation('initial_location');
 
     this.setState({
       circuitStarted: true,
-      routeCoordinates: [],
+
       distanceTravelled: 0.00,
-      currentSpeed: 0.0,
+      currentSpeed: 0.00,
+      speeds: [],
+
+      routeCoordinates: [],
       prevLatLng: {}
     });
+
     this.startStopStopWatch();
   }
 
@@ -193,13 +193,8 @@ export default class Map extends React.Component {
 
     this.setState({
       circuitStarted: false,
-      routeCoordinates: [],
-      distanceTravelled: 0.00,
-      currentSpeed: 0.0,
-      prevLatLng: {}
     });
 
-    this.calculateAverageVelocity();
     setTimeout(() => {
       this.saveCircuit();
       this.startStopStopWatch();
@@ -208,15 +203,14 @@ export default class Map extends React.Component {
 
   }
 
-  // Average Velocity
-  calculateAverageVelocity() {
+  /* Average Speed */
+  calculateAverageSpeed() {
     let speeds = this.state.speeds;
     let averageSpeed = 0.0;
 
     for (var i = 0; i < speeds.length; i++) {
       averageSpeed += speeds[i];
     }
-
     averageSpeed = parseFloat(averageSpeed / speeds.length).toFixed(2);
 
     return averageSpeed;
@@ -229,19 +223,21 @@ export default class Map extends React.Component {
       content = (
         <View style={styles.buttonContainer}>
           <View style={[styles.bubble, styles.button]}>
-
             <Text style={{ fontWeight: 'bold' }}>Distância</Text>
             <Text style={{ marginBottom: 10 }}>{parseFloat(this.state.distanceTravelled).toFixed(2)} km</Text>
 
             <Text style={{ fontWeight: 'bold' }}>Velocidade</Text>
             <Text style={{ marginBottom: 10 }}>{this.state.currentSpeed} km/h</Text>
 
-            <Text style={{ fontWeight: 'bold' }}>Tempo</Text>
+            <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>Tempo</Text>
             <Stopwatch laps start={this.state.isStopwatchStart} reset={this.state.resetStopwatch} options={styles} getTime={this.getFormattedTime} />
           </View>
           <View style={[styles.bubble, styles.button]}>
             <Button onPress={this.finishCircuit} title="Terminar Circuito" />
+            <Image source={require("../assets/images/icon.png")} style={{ height: 60, width: 60 }} />
           </View>
+
+
         </View>
       );
     } else {

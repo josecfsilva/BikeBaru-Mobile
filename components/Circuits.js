@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet, FlatList, Text, View, RefreshControl, Button } from 'react-native';
 import { Icon } from 'react-native-elements';
 
+const SERVER_URL = 'https://bikebaru-server.herokuapp.com';
+
 export default class Circuits extends React.Component {
 
     constructor() {
@@ -15,8 +17,9 @@ export default class Circuits extends React.Component {
         this.loadCircuits();
     }
 
+    /* List Circuits */
     loadCircuits = () => {
-        fetch('https://bikebaru-server.herokuapp.com/circuits/')
+        fetch(SERVER_URL + '/circuits/')
             .then(response => response.json())
             .then(response => this.setState({
                 circuits: response.data,
