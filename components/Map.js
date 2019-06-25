@@ -229,7 +229,7 @@ export default class Map extends React.Component {
             <Text style={{ fontWeight: 'bold' }}>Velocidade</Text>
             <Text style={{ marginBottom: 10 }}>{this.state.currentSpeed} km/h</Text>
 
-            <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>Tempo</Text>
+            <Text style={{ fontWeight: 'bold', marginBottom: 7 }}>Tempo</Text>
             <Stopwatch laps start={this.state.isStopwatchStart} reset={this.state.resetStopwatch} options={styles} getTime={this.getFormattedTime} />
           </View>
           <View style={[styles.bubble, styles.button]}>
