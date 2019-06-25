@@ -234,7 +234,7 @@ export default class Map extends React.Component {
           </View>
           <View style={[styles.bubble, styles.button]}>
             <Button onPress={this.finishCircuit} title="Terminar Circuito" />
-            <Image source={require("../assets/images/icon.png")} style={{ height: 60, width: 60 }} />
+            <Image source={require("../assets/images/icon.png")} style={{ height: 70, width: 70 }} />
           </View>
 
 
