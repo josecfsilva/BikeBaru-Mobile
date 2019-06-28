@@ -55,16 +55,16 @@ export default class Map extends React.Component {
           longitude
         };
 
-        if (Platform.OS === "android") {
+        /*if (Platform.OS === "android") {
           if (this.marker) {
             this.marker._component.animateMarkerToCoordinate(
               newCoordinate,
               500
             );
           }
-        } else {
-          coordinate.timing(newCoordinate).start();
-        }
+        } else {*/
+        coordinate.timing(newCoordinate).start();
+        /*}*/
 
         this.setState({
           latitude,
