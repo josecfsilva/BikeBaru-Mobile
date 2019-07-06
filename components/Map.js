@@ -1,8 +1,10 @@
 import React from "react";
-import { StyleSheet, View, Alert, Image, Text, Platform, TouchableOpacity, Button } from "react-native";
+import { StyleSheet, View, Alert, Image, Text, TouchableOpacity, Button } from "react-native";
 import MapView, { Marker, AnimatedRegion, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import haversine from "haversine";
 import { Stopwatch } from 'react-native-stopwatch-timer';
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
 
 const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
@@ -44,6 +46,8 @@ export default class Map extends React.Component {
 
   componentDidMount() {
     const { coordinate } = this.state;
+
+    this.requestCameraPermission();
 
     this.watchID = navigator.geolocation.watchPosition(
       position => {
@@ -88,6 +92,26 @@ export default class Map extends React.Component {
 
   componentWillUnmount() {
     navigator.geolocation.clearWatch(this.watchID);
+  }
+
+  requestCameraPermission = async () => {
+    Location.getProviderStatusAsync()
+      .then(status => {
+        console.log('Getting status');
+        if (!status.locationServicesEnabled) {
+          throw new Error('Location services disabled');
+        }
+      })
+      .then(_ => Permissions.askAsync(Permissions.LOCATION))
+      .then(permissions => {
+        console.log('Getting permissions');
+        if (permissions.status !== 'granted') {
+          throw new Error('Ask for permissions');
+        }
+      }) 
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   /* Add Circuit */
