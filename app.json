@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "bikebaru-mapp",
-    "slug": "bikebaru-mapp",
+    "name": "BikeBaru",
+    "slug": "BikeBaru",
     "privacy": "public",
     "sdkVersion": "33.0.0",
     "platforms": [
@@ -21,19 +21,15 @@
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
-      "**/*"
+      "assets/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "ios",
-      "publishBundlePath": "ios/bikebaru-mapp/Supporting/shell-app.bundle",
-      "publishManifestPath": "ios/bikebaru-mapp/Supporting/shell-app-manifest.json"
+      "bundleIdentifier": "com.ips.bikebaru"
     },
     "scheme": "exp6609b9e0134840489c91b33e91592013",
     "android": {
-      "package": "com.example.android",
-      "publishBundlePath": "android/app/src/main/assets/shell-app.bundle",
-      "publishManifestPath": "android/app/src/main/assets/shell-app-manifest.json"
+      "package": "com.ips.bikebaru"
     }
   }
 }
