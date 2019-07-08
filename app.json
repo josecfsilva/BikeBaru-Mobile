@@ -29,11 +29,6 @@
       "publishBundlePath": "ios/bikebaru-mapp/Supporting/shell-app.bundle",
       "publishManifestPath": "ios/bikebaru-mapp/Supporting/shell-app-manifest.json"
     },
-    "isDetached": true,
-    "detach": {
-      "iosExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/ios-v2.11.0-sdk33.0.0-4b05019b-b5d6-454b-8350-09c2187b9f91.tar.gz",
-      "androidExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/android-v2.11.4-sdk33.0.0-6a4f0f3e-1f1b-4c33-9155-d0237f6d7c34.tar.gz"
-    },
     "scheme": "exp6609b9e0134840489c91b33e91592013",
     "android": {
       "package": "com.example.android",
