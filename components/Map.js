@@ -47,7 +47,7 @@ export default class Map extends React.Component {
   componentDidMount() {
     const { coordinate } = this.state;
 
-    this.requestCameraPermission();
+    this.requestPermission();
 
     this.watchID = navigator.geolocation.watchPosition(
       position => {
@@ -76,7 +76,7 @@ export default class Map extends React.Component {
           routeCoordinates: routeCoordinates.concat([newCoordinate]),
           distanceTravelled: distanceTravelled + this.calculateDistance(newCoordinate),
           speeds: speeds.concat(speed),
-          currentSpeed: speed,
+          currentSpeed: parseFloat(speed).toFixed(2),
           prevLatLng: newCoordinate
         });
       },
@@ -94,7 +94,7 @@ export default class Map extends React.Component {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
-  requestCameraPermission = async () => {
+  requestPermission = async () => {
     Location.getProviderStatusAsync()
       .then(status => {
         console.log('Getting status');
@@ -108,7 +108,7 @@ export default class Map extends React.Component {
         if (permissions.status !== 'granted') {
           throw new Error('Ask for permissions');
         }
-      }) 
+      })
       .catch(error => {
         console.log(error);
       });
